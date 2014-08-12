@@ -1,0 +1,53 @@
+public static class XmlSerializerHelper
+    {
+        /// <summary>
+        /// Maintains a list of XML formatters
+        /// </summary>
+        private static readonly Dictionary<Type, XmlSerializer> XmlFormatter;
+
+        static XmlSerializerHelper()
+        {
+            XmlFormatter = new Dictionary<Type, XmlSerializer>();
+        }
+
+        /// <summary>
+        /// Gets the formatter for the specified type. If
+        /// the formatter is not available it is created.
+        /// </summary>
+        private static XmlSerializer GetFormatter(Type objType)
+        {
+            if (!XmlFormatter.ContainsKey(objType))
+                XmlFormatter.Add(objType, new XmlSerializer(objType));
+            return XmlFormatter[objType];
+        }
+
+        /// <summary>
+        /// Serializes the object to XML
+        /// </summary>
+        public static string ToXml<T>(T obj)
+            where T : new()
+        {
+            using (StringWriter sw = new StringWriter())
+            {
+                GetFormatter(obj.GetType()).Serialize(sw, obj);
+                return sw.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Deserializes the object from XML
+        /// </summary>
+        public static T FromXml<T>(string objectAsXml)
+            where T : new()
+        {
+            if (!String.IsNullOrEmpty(objectAsXml))
+            {
+                using (StringReader sr = new StringReader(objectAsXml))
+                {
+                    return (T)GetFormatter(typeof(T)).Deserialize(sr);
+                }
+            }
+
+            return default(T);
+        }
+    }
