@@ -1,0 +1,42 @@
+public static class StorageHelper
+    {
+        public static void SaveToIsolatedStorage()
+        {
+            try
+            {
+                var settings = new Dictionary<string, string>();
+                settings.Add("marsupial", "TEST");
+                BinaryFormatter formatter = new BinaryFormatter();
+                var store = IsolatedStorageFile.GetUserStoreForAssembly();
+                // Save
+                using (var stream = store.OpenFile("settings.cfg", FileMode.OpenOrCreate, FileAccess.Write))
+                {
+                    formatter.Serialize(stream, settings);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        public static void ReadFromIsolatedStorage()
+        {
+            try
+            {
+                var settings = new Dictionary<string, string>();
+                BinaryFormatter formatter = new BinaryFormatter();
+                var store = IsolatedStorageFile.GetUserStoreForAssembly();
+                // Load
+                using (var stream = store.OpenFile("settings.cfg", FileMode.OpenOrCreate, FileAccess.Read))
+                {
+                    settings = (Dictionary<string, string>)formatter.Deserialize(stream);
+                }
+
+                var wombat = (string)settings["marsupial"];
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+    }
